@@ -29,7 +29,7 @@ public class RmiExporter {
 					"Cannot export a non RemoteService annotated class!");
 		}
 
-		String bindName = rsAnnotation.bind();
+		String bindName = rsAnnotation.name();
 		try {
 			ClassPool cp = ClassPool.getDefault();
 			CtClass ra = cp.get("it.jugsiracusa.metarmi.RmiObjectAdapter");
