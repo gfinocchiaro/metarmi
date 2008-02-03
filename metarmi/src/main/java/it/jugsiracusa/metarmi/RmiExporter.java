@@ -3,6 +3,7 @@ package it.jugsiracusa.metarmi;
 import it.jugsiracusa.metarmi.metadata.RemoteMethod;
 import it.jugsiracusa.metarmi.metadata.RemoteService;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.rmi.Remote;
 import java.rmi.registry.Registry;
@@ -14,7 +15,6 @@ import java.util.Set;
 import javassist.CannotCompileException;
 import javassist.ClassPool;
 import javassist.CtClass;
-import javassist.CtField;
 import javassist.CtMethod;
 
 public class RmiExporter {
@@ -32,10 +32,7 @@ public class RmiExporter {
 		String bindName = rsAnnotation.bind();
 		try {
 			ClassPool cp = ClassPool.getDefault();
-			CtClass ra = cp
-					.makeClass("it.jugsiracusa.rmi.metadata.RemoteAdapter");
-
-			addTargetField(remoteClass, ra);
+			CtClass ra = cp.get("it.jugsiracusa.metarmi.RmiObjectAdapter");
 
 			Method[] m = remoteClass.getDeclaredMethods();
 			Set<String> interfaces = new HashSet<String>();
@@ -46,7 +43,9 @@ public class RmiExporter {
 					for (Class<?> interaceClass : metaMethod.targetInterface()) {
 						interfaces.add(interaceClass.getName());
 					}
-					addDelegatingMethod(ra, method, metaMethod);
+					String methodSrc = makeDelegatingMethod(method, metaMethod,
+							remoteClass);
+					ra.addMethod(CtMethod.make(methodSrc, ra));
 				}
 			}
 			for (Iterator<String> iterator = interfaces.iterator(); iterator
@@ -56,8 +55,11 @@ public class RmiExporter {
 			}
 
 			Class<?> adapterClass = ra.toClass();
-			Object adapter = adapterClass.newInstance();
-			adapterClass.getDeclaredField("target").set(adapter, remoteObject);
+			Object adapter = adapterClass.getConstructor(Object.class)
+					.newInstance(remoteObject);
+			Field remoteField = adapterClass.getDeclaredField("remoteObject");
+			remoteField.setAccessible(true);
+			remoteField.set(adapter, remoteObject);
 
 			/* Exporting object */
 			Remote stub = UnicastRemoteObject.exportObject((Remote) adapter, 0);
@@ -71,24 +73,20 @@ public class RmiExporter {
 
 	}
 
-	private static void addDelegatingMethod(CtClass ra, Method method,
-			RemoteMethod annotation) throws CannotCompileException {
+	private static String makeDelegatingMethod(Method method, RemoteMethod annotation,
+			Class<?> targetType)
+			throws CannotCompileException {
 		String implementingMethod = method.getName();
 		String declaredName = annotation.name();
 		String interfaceMethod = "".equals(declaredName) ? implementingMethod
 				: declaredName;
 		String returnType = method.getReturnType().getName();
 		String methodSrc = String.format(
-				"public %s %s() { return target.%s(); }", returnType,
-				interfaceMethod, implementingMethod);
-		ra.addMethod(CtMethod.make(methodSrc, ra));
-	}
+				"public %s %s() { return ((%s)remoteObject).%s(); }",
+				returnType, interfaceMethod, targetType.getName(),
+				implementingMethod);
 
-	private static void addTargetField(Class<? extends Object> remoteClass,
-			CtClass ra) throws CannotCompileException {
-		CtField target = CtField.make("public " + remoteClass.getName()
-				+ "  target;", ra);
-		ra.addField(target);
+		return methodSrc;
 	}
 
 }
