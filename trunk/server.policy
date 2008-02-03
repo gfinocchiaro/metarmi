@@ -1,0 +1,4 @@
+grant codeBase "file:/home/gianluca/workspaces/jug-rmi/JugRmi/-" {
+        permission java.security.AllPermission; 
+};
+    
