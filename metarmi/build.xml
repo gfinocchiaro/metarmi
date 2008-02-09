@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ====================================================================== 
+     03/feb/08 17:32:35                                                        
+
+     metarmi    
+     A small java library implementing RMI annotations
+                   
+     Gianluca Finocchiaro                                                                
+     ====================================================================== -->
+<project name="metarmi" default="dist-bin">
+
+	<property name="version" value="0.1.0" />
+	<property name="metarmi" value="metarmi-${version}" />
+	<property name="src.dir" location="src" />
+	<property name="src.java.dir" location="${src.dir}/main/java" />
+	<property name="lib.dir" location="lib" />
+	<property name="dist.dir" location="dist" />
+	<property name="build.dir" location="build" />
+	<property name="temp.dir" location="temp" />
+	<property name="classes.dir" location="${build.dir}/classes" />
+
+	<property name="jar" value="${metarmi}.jar" />
+
+	<path id="classpath">
+		<fileset dir="${lib.dir}">
+			<include name="*.jar" />
+		</fileset>
+	</path>
+
+	<target name="compile">
+		<mkdir dir="${classes.dir}" />
+		<javac srcdir="${src.java.dir}" destdir="${classes.dir}" classpathref="classpath" />
+	</target>
+
+	<target name="init">
+		<mkdir dir="${dist.dir}"/>
+	</target>
+
+
+	<target name="dist-bin" depends="init, compile">
+		<mkdir dir="${temp.dir}/${metarmi}" />
+		<jar destfile="${temp.dir}/${metarmi}/${metarmi}.jar">
+			<fileset dir="${classes.dir}">
+				<include name="**/*.class" />
+			</fileset>
+		</jar>
+		<zip destfile="${dist.dir}/${metarmi}-bin.zip" basedir="${temp.dir}/${metarmi}" />
+		<tar destfile="${dist.dir}/${metarmi}-bin.tar.gz" compression="gzip" basedir="${temp.dir}/${metarmi}"/>
+	</target>
+
+	<target name="dist-src" depends="init">
+		<mkdir dir="${temp.dir}/${metarmi}-src" />
+		<copy todir="${temp.dir}/${metarmi}-src">
+			<fileset dir=".">
+				<include name="src/**" />
+				<include name="lib/**" />
+				<include name="build.xml" />
+			</fileset>
+		</copy>
+		<zip destfile="${dist.dir}/${metarmi}-src.zip" basedir="${temp.dir}/${metarmi}-src" />
+		<tar destfile="${dist.dir}/${metarmi}-src.tar.gz" compression="gzip" basedir="${temp.dir}/${metarmi}-src"/>
+	</target>
+
+	<target name="clean">
+		<delete dir="${dist.dir}" />
+	</target>
+
+	<target name="cleanAll">
+		<delete dir="${temp.dir}" />
+		<delete dir="${build.dir}" />
+		<delete dir="${dist.dir}" />
+	</target>
+
+
+</project>
