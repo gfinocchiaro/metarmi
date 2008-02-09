@@ -41,10 +41,10 @@ import example.hello.Greetings;
 import it.jugsiracusa.metarmi.metadata.RemoteMethod;
 import it.jugsiracusa.metarmi.metadata.RemoteService;
 
-@RemoteService(bind = "greetings")
-public class Server {
+@RemoteService(name = "otherGreetings")
+public class OtherGreetings {
 
-	public Server() {
+	public OtherGreetings() {
 	}
 
 	@RemoteMethod(targetInterface = Greetings.class)
@@ -52,7 +52,7 @@ public class Server {
 		return "Hello, world!";
 	}
 
-	@RemoteMethod(name="sayGoodBye", targetInterface = Greetings.class)
+	@RemoteMethod(name = "sayGoodBye", targetInterface = Greetings.class)
 	public String goodBye() {
 		return "Good bye!";
 	}
