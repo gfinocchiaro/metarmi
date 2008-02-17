@@ -11,6 +11,6 @@ public @interface RemoteMethod {
 	
 	String name() default "";
 	
-	Class[] targetInterface();
+	Class[] targetInterface() default {};
 
 }
