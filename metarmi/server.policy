@@ -1,4 +1,4 @@
-grant codeBase "file:/home/gianluca/workspaces/jug-rmi/metarmi/-" {
+grant codeBase "file:/home/gianluca/workspaces/jug-rmi/-" {
         permission java.security.AllPermission; 
 };
     
