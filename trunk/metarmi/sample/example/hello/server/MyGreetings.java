@@ -1,23 +1,29 @@
 package example.hello.server;
 
-import example.hello.Greetings;
 import it.jugsiracusa.metarmi.metadata.RemoteMethod;
 import it.jugsiracusa.metarmi.metadata.RemoteService;
 
-@RemoteService(name = "greetings")
-public class MyGreetings {
+import java.io.Serializable;
+
+@RemoteService(name = "greetings", target="example.hello.server.Greetings")
+public class MyGreetings implements Serializable {
 
 	public MyGreetings() {
 	}
 
-	@RemoteMethod(targetInterface = Greetings.class)
-	public String sayHello() {
-		return "Hello, world!";
+	@RemoteMethod(name = "sayHello")
+	public String hello() {
+		return "hello";
+
 	}
 
-	@RemoteMethod(name = "sayGoodBye", targetInterface = Greetings.class)
+	@RemoteMethod(name = "sayGoodBye")
 	public String goodBye() {
 		return "Good bye!";
+	}
+
+	private void foo() {
+
 	}
 
 }

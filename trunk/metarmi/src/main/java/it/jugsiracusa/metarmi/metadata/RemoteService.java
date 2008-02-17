@@ -10,5 +10,7 @@ import java.lang.annotation.Target;
 public @interface RemoteService {
 	
 	String name();
+	
+	String target();
 
 }
