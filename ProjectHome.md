@@ -1,0 +1,1 @@
+metarmi library allows to exporting pojo with no needs to implements any remote interfaces. Just annotate a pojo with specific annotations.
